@@ -8,11 +8,13 @@ import { toast } from "react-hot-toast"
 import { Container } from "@/app/components/Container"
 import Heading from "@/app/components/Heading"
 import { SafeOffer } from "@/app/types"
+import { Button } from "@/app/components/Button"
 
 interface OffersClientProps {
   offers: SafeOffer[]
 }
 
+const Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const OffersClient = ({ offers }: { offers: any }) => {
   const router = useRouter()
   const [deletingId, setDeletingId] = useState("")
@@ -21,7 +23,7 @@ const OffersClient = ({ offers }: { offers: any }) => {
     (id: string) => {
       setDeletingId(id)
       axios.patch(`/api/offers/${id}`).then(() => {
-        toast.success("User Banned")
+        toast.success("Offer Stashed")
         router.refresh()
       }).catch((error) => {
         console.log(error)
@@ -32,13 +34,29 @@ const OffersClient = ({ offers }: { offers: any }) => {
     },
     [router],
   )
+  const formatDate = (date: string) => {
+    const dateValue = new Date(date);
+    const formattedDate = dateValue.getDate() + "-" + (Months[dateValue.getMonth()]) + "-" + dateValue.getFullYear();
+    return formattedDate;
+  }
 
   return (
     <Container>
-      <Heading
-        title="Offers"
-        subtitle="List of your offers"
-      />
+      <span className="grid grid-cols-5">
+        <span className="col-span-4">
+
+          <Heading
+            title="Offers"
+            subtitle="List of your offers"
+          />
+        </span>
+        <span className="col-span-1">
+          <button
+            className="w-full bg-blue-500 text-white px-6 py-2 rounded-md"
+            onClick={() => router.push("/admin/offers/new")}
+          >Add new Offer</button>
+        </span>
+      </span>
       <div className="mt-10 h-full">
         <div className="relative overflow-x-auto shadow-md sm:rounded-md">
           <table className="w-full text-sm text-left text-gray-700">
@@ -74,18 +92,18 @@ const OffersClient = ({ offers }: { offers: any }) => {
                     {offer?.price}
                   </th>
                   <td className="px-6 py-4">
-                    {offer?.startDate}
+                    {formatDate(offer?.startDate)}
                   </td>
                   <td className="px-6 py-4">
-                    {offer?.endDate}
+                    {formatDate(offer?.endDate)}
                   </td>
                   <td className="px-6 py-4">
-                    {offer?.status ? 'Yes' : 'No'}
+                    {offer?.status.toLocaleUpperCase()}
                   </td>
                   <td className="px-6 py-4 relative">
-                    {offer.status === 'ACTIVE' && (
+                    {offer.status.toLocaleLowerCase() === 'active' && (
                       <button className="font-medium text-red-600 hover:underline focus:outline-none" onClick={() => onCancel(offer.id)}>
-                        Delete Offer
+                        Stash Offer
                       </button>
                     )}
                   </td>
