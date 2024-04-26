@@ -83,3 +83,13 @@ model Reservation {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
+
+model Offers {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  price     Int
+  startDate DateTime
+  endDate   DateTime
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

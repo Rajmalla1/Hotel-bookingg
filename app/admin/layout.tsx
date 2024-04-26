@@ -1,20 +1,22 @@
 "use client"
 
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import toast from "react-hot-toast";
 import { FiLogOut, FiUsers } from "react-icons/fi";
-import { MdAddCircleOutline, MdOutlineDashboard, MdOutlineRoom } from "react-icons/md";
+import { MdAddCircleOutline, MdOutlineLocalOffer, MdOutlineRoom } from "react-icons/md";
 import { TbBrandBooking } from "react-icons/tb";
 import useRentModal from "../hooks/useRentModal";
-import toast from "react-hot-toast";
-import { signOut } from "next-auth/react";
 
 const adminMenu = [
     // { label: 'Dashboard', href: 'admin', icon: MdOutlineDashboard, },
     { label: 'Users', href: 'admin/users', icon: FiUsers },
     { label: 'Rooms', href: 'admin/properties', icon: MdOutlineRoom },
     { label: 'Bookings', href: 'admin/reservations', icon: TbBrandBooking },
+    { label: 'Offers', href: 'admin/offers', icon: MdOutlineLocalOffer },
+
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
