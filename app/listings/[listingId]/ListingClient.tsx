@@ -86,8 +86,13 @@ const ListingClient: React.FC<ListingClientProps> = (
   const onCreateReservation = useCallback(
     async () => {
       if (!currentUser) return loginModal.onOpen();
-
       setIsLoading(true);
+      if (currentUser.role === 'admin') {
+        toast.error('Admin cannot book');
+        setIsLoading(false);
+        return;
+      }
+
       await axios.post('/api/reservations', {
         totalPrice,
         startDate: dateRange.startDate,
