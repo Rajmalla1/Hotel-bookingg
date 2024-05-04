@@ -86,7 +86,7 @@ model Reservation {
 
 model Offers {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  price     Int
+  price     Float
   startDate DateTime
   endDate   DateTime
   status    String
