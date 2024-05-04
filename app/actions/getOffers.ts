@@ -9,6 +9,14 @@ export default async function getOffers() {
         createdAt: "desc"
       }
     })
+    offers.forEach(async (offer) => {
+      if (offer.endDate < new Date(Date.now())) {
+        await prisma.offers.update({
+          where: { id: offer.id },
+          data: { status: 'ARCHIVE' }
+        })
+      }
+    })
     const safeOffers = offers.map((offer) => ({
       ...offer,
       createdAt: offer.createdAt.toISOString(),

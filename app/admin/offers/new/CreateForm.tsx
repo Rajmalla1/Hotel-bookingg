@@ -15,20 +15,20 @@ const CreateForm = () => {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        // TODO: Add code to submit the offer data
         const data = {
             price: offerPrice,
             startDate: new Date(offerStartDate).toISOString(),
             endDate: new Date(offerEndDate).toISOString()
         }
         await axios.post('/api/offers', data)
-            .then(() => {
+            .then((res) => {
+                // console.warn("🚀 ~ file: CreateForm.tsx:25 ~ .then ~ res:", res);
                 toast.success("Offer Created");
                 router.push("/admin/offers")
             })
             .catch((error) => {
                 console.log(error);
-                toast.error("Could not create offer. Please try again.");
+                toast.error("An active offer exists aleady!!");
             });
     };
 

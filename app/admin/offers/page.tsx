@@ -4,8 +4,9 @@ import ClientOnly from "@/app/components/ClientOnly"
 import { EmptyState } from "@/app/components/EmptyState"
 import OffersClient from "./OffersClient"
 
-const OfefrsPage = async () => {
+const OffersPage = async () => {
     const offers = await getOffers();
+
 
     if (offers.length === 0) {
         return (
@@ -27,4 +28,4 @@ const OfefrsPage = async () => {
     )
 }
 
-export default OfefrsPage
+export default OffersPage

@@ -2,7 +2,7 @@
 
 import axios from "axios"
 import { useRouter } from "next/navigation"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 
 import { Container } from "@/app/components/Container"
@@ -14,10 +14,27 @@ interface OffersClientProps {
   offers: SafeOffer[]
 }
 
+
+
+
 const Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const OffersClient = ({ offers }: { offers: any }) => {
   const router = useRouter()
   const [deletingId, setDeletingId] = useState("")
+
+  useEffect(() => {
+    fetchOffers()
+  }, [])
+
+  const fetchOffers = async () => {
+    try {
+      const response = await axios.get("/api/offers")
+      console.log("🚀 ~ file: OffersClient.tsx ~ fetchOffers ~ response", response)
+    } catch (error) {
+      console.log("🚀 ~ file: OffersClient.tsx ~ fetchOffers ~ error", error)
+    }
+  }
+
 
   const onCancel = useCallback(
     (id: string) => {
