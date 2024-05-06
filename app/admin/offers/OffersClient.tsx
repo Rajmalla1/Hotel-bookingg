@@ -10,12 +10,9 @@ import Heading from "@/app/components/Heading"
 import { SafeOffer } from "@/app/types"
 import { Button } from "@/app/components/Button"
 
-interface OffersClientProps {
-  offers: SafeOffer[]
-}
-
-
-
+// interface OffersClientProps {
+//   offers: SafeOffer[]
+// }
 
 const Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const OffersClient = ({ offers }: { offers: any }) => {
@@ -29,9 +26,8 @@ const OffersClient = ({ offers }: { offers: any }) => {
   const fetchOffers = async () => {
     try {
       const response = await axios.get("/api/offers")
-      console.log("🚀 ~ file: OffersClient.tsx ~ fetchOffers ~ response", response)
     } catch (error) {
-      console.log("🚀 ~ file: OffersClient.tsx ~ fetchOffers ~ error", error)
+      console.log(error)
     }
   }
 

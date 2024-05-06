@@ -3,28 +3,51 @@ import { Container } from '@/app/components/Container';
 import Heading from '@/app/components/Heading';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
-const CreateForm = () => {
+const CreateForm = ({ users }: { users: any }) => {
+    console.log("🚀 ~ file: CreateForm.tsx:10 ~ CreateForm ~ users:", users);
     const [offerPrice, setOfferPrice] = useState('');
     const [offerStartDate, setOfferStartDate] = useState("");
     const [offerEndDate, setOfferEndDate] = useState("");
-    const router = useRouter()
+    const router = useRouter();
 
+    let userEmails: string[] = [];
+    useEffect(() => {
+        users.forEach((element: any) => {
+            console.log("🚀 ~ file: CreateForm.tsx:20 ~ users.forEach ~ element.email:", element.email);
+            userEmails.push(element.email);
+        });
+    }, [])
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        let emails: string[] = [];
+        users.map((user: any) => {
+            emails.push(user.email);
+        })
         const data = {
             price: offerPrice,
             startDate: new Date(offerStartDate).toISOString(),
             endDate: new Date(offerEndDate).toISOString()
         }
+        const emailData = {
+            email: emails,
+            subject: "New Offer Available",
+            title: "New Offer Available",
+            text: `New Offer Available with ${offerPrice}% discount. Offer Avaliable from ${new Date(offerStartDate).toLocaleDateString()} to ${new Date(offerEndDate).toLocaleDateString()}`
+        }
         await axios.post('/api/offers', data)
             .then((res) => {
-                // console.warn("🚀 ~ file: CreateForm.tsx:25 ~ .then ~ res:", res);
                 toast.success("Offer Created");
                 router.push("/admin/offers")
+            }).then(async () => {
+                await axios.post('/api/sendEmail', emailData).then((ress) => {
+                    console.log(ress);
+                }).catch((error) => {
+                    toast.error("Error Sending Email!!")
+                })
             })
             .catch((error) => {
                 console.log(error);
