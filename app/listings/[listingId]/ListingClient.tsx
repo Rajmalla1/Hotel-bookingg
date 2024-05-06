@@ -92,7 +92,12 @@ const ListingClient: React.FC<ListingClientProps> = (
         setIsLoading(false);
         return;
       }
-
+      const emailData = {
+        email: currentUser.email,
+        subject: "Booking Confirmation",
+        title: "Booking Confira=mation",
+        text: `Room Booking Confirmed.\nRoom Name:${listing.title}\nBooking Date: ${dateRange.startDate} to ${dateRange.endDate} \nTotal Price: ${totalPrice}`
+      }
       await axios.post('/api/reservations', {
         totalPrice,
         startDate: dateRange.startDate,
@@ -102,11 +107,12 @@ const ListingClient: React.FC<ListingClientProps> = (
       }).then(async () => {
         toast.success('Listing Reserved');
         setDateRange(initialDateRange);
-        // Redirect to "/trips"
+        await axios.post('/api/sendEmail', emailData).then((ress) => {
+          console.log(ress);
+        }).catch((error) => {
+          toast.error("Error Sending Email!!")
+        })
         await handleKhaltiPayment();
-        // setTimeout(() => {
-        //   // router.push('/trips');
-        // }, 200);
       }).catch((error) => {
         toast.error('Something Went Wrong');
       }).finally(() => {
