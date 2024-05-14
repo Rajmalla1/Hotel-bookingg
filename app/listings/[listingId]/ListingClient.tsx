@@ -56,6 +56,7 @@ const ListingClient: React.FC<ListingClientProps> = (
   const [requests, setRequests] = useState('');
   const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
+  const [activeOffer, setActiveOffer] = useState(0);
 
 
   const handleKhaltiPayment = useCallback(async () => {
@@ -85,8 +86,18 @@ const ListingClient: React.FC<ListingClientProps> = (
   const onCreateReservation = useCallback(
     async () => {
       if (!currentUser) return loginModal.onOpen();
-
       setIsLoading(true);
+      if (currentUser.role === 'admin') {
+        toast.error('Admin cannot book');
+        setIsLoading(false);
+        return;
+      }
+      const emailData = {
+        email: currentUser.email,
+        subject: "Booking Confirmation",
+        title: "Booking Confira=mation",
+        text: `Room Booking Confirmed.\nRoom Name:${listing.title}\nBooking Date: ${dateRange.startDate} to ${dateRange.endDate} \nTotal Price: ${totalPrice}`
+      }
       await axios.post('/api/reservations', {
         totalPrice,
         startDate: dateRange.startDate,
@@ -96,11 +107,12 @@ const ListingClient: React.FC<ListingClientProps> = (
       }).then(async () => {
         toast.success('Listing Reserved');
         setDateRange(initialDateRange);
-        // Redirect to "/trips"
+        await axios.post('/api/sendEmail', emailData).then((ress) => {
+          console.log(ress);
+        }).catch((error) => {
+          toast.error("Error Sending Email!!")
+        })
         await handleKhaltiPayment();
-        // setTimeout(() => {
-        //   // router.push('/trips');
-        // }, 200);
       }).catch((error) => {
         toast.error('Something Went Wrong');
       }).finally(() => {
@@ -117,13 +129,26 @@ const ListingClient: React.FC<ListingClientProps> = (
         dateRange.startDate
       );
       if (dayCount && listing.price) {
-        setTotalPrice(dayCount * listing.price);
+        let offerPrice = listing.price;
+        if (activeOffer > 0) {
+          offerPrice = (listing.price - (listing.price * activeOffer / 100));
+        }
+        setTotalPrice((dayCount * offerPrice));
       } else {
         setTotalPrice(listing.price);
       }
     }
+    fetchOffers();
   }, [dateRange.endDate, dateRange.startDate, listing.price, totalPrice]);
 
+  const fetchOffers = async () => {
+    try {
+      const response = await axios.get('/api/offers');
+      setActiveOffer(response.data.offer.price);
+    } catch (error) {
+      toast.error("Could not fetch offers")
+    }
+  }
 
   // fetching category
   const category = useMemo(() => {
@@ -132,52 +157,59 @@ const ListingClient: React.FC<ListingClientProps> = (
 
   return (
     <Container>
-      <div className="max-w-screen-lg mx-auto pt-6">
-        <div className="flex flex-col gap-6">
-          <ListingHead
-            title={listing.title}
-            imageSrc={listing.imageSrc}
-            // locationValue={listing.locationValue}
-            id={listing.id}
-            currentUser={currentUser}
-          />
-          <div
-            className="
-							grid
-							grid-cols-1
-							md:grid-cols-7
-							md:gap-6
-							mt-6
-					"
-          >
-            <ListingInfo
-              user={listing.user}
-              description={listing.description}
-              category={category}
-              roomCount={listing.roomCount}
-              guestCount={listing.guestCount}
-              bathroomCount={listing.bathroomCount}
+      <div className="relative">
+
+        <div className="max-w-screen-lg mx-auto pt-6">
+          <div className="flex flex-col gap-6">
+            <ListingHead
+              title={listing.title}
+              imageSrc={listing.imageSrc}
+              // locationValue={listing.locationValue}
+              id={listing.id}
+              currentUser={currentUser}
             />
             <div
               className="
-                order-first
-                mb-10
-                md:order-last
-                md:col-span-3
-            ">
-              <ListingReservation
-                price={listing.price}
-                totalPrice={totalPrice}
-                onChangeDate={(value) => setDateRange(value)}
-                dateRange={dateRange}
-                onSubmit={onCreateReservation}
-                specialRequests={(requests) => setRequests(requests)}
-                disabled={isLoading}
-                disabledDates={disabledDates}
+            grid
+            grid-cols-1
+            md:grid-cols-7
+            md:gap-6
+            mt-6
+            "
+            >
+              <ListingInfo
+                user={listing.user}
+                description={listing.description}
+                category={category}
+                roomCount={listing.roomCount}
+                guestCount={listing.guestCount}
+                bathroomCount={listing.bathroomCount}
               />
+              <div
+                className="
+              order-first
+              mb-10
+              md:order-last
+              md:col-span-3
+              ">
+                <ListingReservation
+                  price={listing.price}
+                  totalPrice={totalPrice}
+                  onChangeDate={(value) => setDateRange(value)}
+                  dateRange={dateRange}
+                  onSubmit={onCreateReservation}
+                  specialRequests={(requests) => setRequests(requests)}
+                  disabled={isLoading}
+                  disabledDates={disabledDates}
+                />
+              </div>
             </div>
           </div>
         </div>
+        {activeOffer > 0 && (
+          <div style={{ zIndex: 9999 }} className='absolute px-2 py-3 text-white bottom-[40px] right-[20px] bg-green-400'>
+            <span>{activeOffer} % Off on all rooms</span>
+          </div>)}
       </div>
     </Container>
   );

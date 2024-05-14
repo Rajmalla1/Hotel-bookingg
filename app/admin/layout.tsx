@@ -1,25 +1,30 @@
 "use client"
 
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import toast from "react-hot-toast";
 import { FiLogOut, FiUsers } from "react-icons/fi";
-import { MdAddCircleOutline, MdOutlineDashboard, MdOutlineRoom } from "react-icons/md";
+import { MdAddCircleOutline, MdOutlineLocalOffer, MdOutlineRoom } from "react-icons/md";
 import { TbBrandBooking } from "react-icons/tb";
 import useRentModal from "../hooks/useRentModal";
-import toast from "react-hot-toast";
-import { signOut } from "next-auth/react";
+import OfferModal from "../components/Modal/OfferModal";
+import useOfferModal from "../hooks/useOfferModal";
 
 const adminMenu = [
     // { label: 'Dashboard', href: 'admin', icon: MdOutlineDashboard, },
     { label: 'Users', href: 'admin/users', icon: FiUsers },
     { label: 'Rooms', href: 'admin/properties', icon: MdOutlineRoom },
     { label: 'Bookings', href: 'admin/reservations', icon: TbBrandBooking },
+    { label: 'Offers', href: 'admin/offers', icon: MdOutlineLocalOffer },
+
 ]
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const rentModal = useRentModal();
+    const offerModal = useOfferModal();
     const router = useRouter();
 
 
@@ -28,10 +33,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         // Open Rent Modal
         rentModal.onOpen()
     }
+    const onOffer = () => {
+        // Open Offer Modal
+        offerModal.onOpen()
+    }
 
     return (
         <div className="grid grid-cols-8 gap-4 overflow-x-hidden">
-            <aside className="sticky top-0 h-[92dvh] col-span-1 min-w-[200px] bg-blue-50 py-10 px-4 flex flex-col justify-between">
+            <aside className="sticky top-0 h-[85dvh] col-span-1 min-w-[200px] bg-blue-50 py-10 px-4 flex flex-col justify-between">
                 <div className="flex flex-col gap-2 overflow-y-hidden">
                     {adminMenu.map(({ label, href, icon }) => (
                         <Link
@@ -46,12 +55,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                     ))}
                     <span className="mt-3">
                         <hr />
-                        <span
-                            className="flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-300 hover:gap-3 transition-all ease-in duration-200 cursor-pointer"
-                            onClick={onRent}
-                        >
-                            <MdAddCircleOutline size={20} />
-                            <small className=" text-gray-500">List a Room</small>
+                        <span className="mt-2 flex flex-col gap-2">
+                            <span
+                                className="flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-300 hover:gap-3 transition-all ease-in duration-200 cursor-pointer"
+                                onClick={onRent}
+                            >
+                                <MdAddCircleOutline size={20} />
+                                <small className=" text-gray-500">List a Room</small>
+                            </span>
+                            <span
+                                className="flex items-center gap-2 px-4 py-2 rounded hover:bg-blue-300 hover:gap-3 transition-all ease-in duration-200 cursor-pointer"
+                                onClick={() => router.push("/admin/offers/new")}
+                            >
+                                <MdAddCircleOutline size={20} />
+                                <small className=" text-gray-500">Create an Offer</small>
+                            </span>
                         </span>
                     </span>
                 </div>

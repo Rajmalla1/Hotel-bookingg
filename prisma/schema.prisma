@@ -76,10 +76,20 @@ model Reservation {
   listingId       String   @db.ObjectId
   startDate       DateTime
   endDate         DateTime
-  totalPrice      Int
+  totalPrice      Float
   createdAt       DateTime @default(now())
   specialRequests String?
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model Offers {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  price     Float
+  startDate DateTime
+  endDate   DateTime
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -12,6 +12,7 @@ import ClientOnly from "./components/ClientOnly"
 import { Navbar } from "./components/Navbar/Navbar"
 import ToasterProvider from "./providers/ToasterProvider"
 import getCurrentUser from "./actions/getCurrentUser"
+import Footer from "./components/Footer"
 
 const nunito = Nunito({ subsets: ["latin"] })
 
@@ -39,7 +40,8 @@ export default async function RootLayout(
           <RentModal />
           <Navbar currentUser={currentUser} />
         </ClientOnly>
-        <div className="pb-20 pt-20">{children}</div>
+        <div className="pb-0 pt-20">{children}</div>
+        <Footer />
         {/* <script type="text/javascript">
         var s1=document.createElement("script");
         var s0=document.getElementsByTagName("script")[0];
